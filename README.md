@@ -20,9 +20,13 @@ For example: REACT_APP_API=http://localhost:3000
 
 ## Technologies and tools:
 - React.js
+- Typescript
 - Styled-Components
 - React-hook-form
 - React-router-dom
+- React-hot-toast
+- React modal
+- React-icons
 - React hooks
 - React query
 - Axios
