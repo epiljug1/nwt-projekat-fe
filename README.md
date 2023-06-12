@@ -4,6 +4,10 @@
 
 In the project directory, you can run:
 
+- First install all the dependecies
+### `npm install`
+
+- To start the project hit
 ### `npm start`
 
 
