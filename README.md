@@ -7,8 +7,9 @@ In the project directory, you can run:
 ### `npm start`
 
 
-##ENV
+## ENV
 For the API add the base URI of your API
-e.g
-REACT_APP_API=http://localhost:3000 
+
+
+For example: REACT_APP_API=http://localhost:3000 
 
