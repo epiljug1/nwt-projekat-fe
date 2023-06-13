@@ -62,7 +62,6 @@ const LoginForm: React.FC<{ onSubmitForm: () => void }> = ({
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
-    console.log(data);
     await fetchUsers();
     const loginData = await loginUser({ body: data });
     const users = await fetchUsers();
@@ -73,6 +72,7 @@ const LoginForm: React.FC<{ onSubmitForm: () => void }> = ({
 
     onSubmitForm();
 
+    localStorage.setItem("email", data.email);
     localStorage.setItem("username", data.email.split("@")[0]);
     localStorage.setItem("token", loginData?.token);
   };

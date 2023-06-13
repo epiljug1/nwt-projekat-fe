@@ -68,10 +68,8 @@ const SignupForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
       }
       closeModal();
     } catch (err: any) {
-      console.log("err: ", err);
       toast.error(err.response.data.message);
     }
-    console.log(data);
   };
 
   return (

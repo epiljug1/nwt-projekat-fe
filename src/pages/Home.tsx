@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/NavBar";
 import styled from "styled-components";
 import Post from "../components/Post";
@@ -9,6 +9,9 @@ import { useQuery } from "react-query";
 import { fetchPosts } from "../api/fetchPosts";
 import { fetchSubforums } from "../api/fetchSubforums";
 import { useGetPosts } from "../hooks/useGetPosts";
+import { fetchPostsLikes } from "../api/fetchPostLikes";
+import { fetchUserLikes } from "../api/fetchUserLikes";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const MainWrapper = styled.div`
   display: flex;
@@ -23,39 +26,6 @@ const PostsContainer = styled.div`
   flex-direction: column;
   margin: 0px auto;
 `;
-
-const POSTS: any = [
-  {
-    title: "Naslov",
-    content: "Content",
-    likes: 10,
-    comments: 10,
-  },
-  {
-    title: "Naslov",
-    content: "Content",
-    likes: 10,
-    comments: 10,
-  },
-  {
-    title: "Naslov",
-    content: "Content",
-    likes: 10,
-    comments: 10,
-  },
-  {
-    title: "Naslov",
-    content: "Content",
-    likes: 10,
-    comments: 10,
-  },
-  {
-    title: "Naslov",
-    content: "Content",
-    likes: 10,
-    comments: 10,
-  },
-];
 
 const Button = styled.button`
   padding: 8px 16px;
@@ -81,13 +51,15 @@ const ButtonWrapper = styled.div`
 `;
 
 const SubforumWrapper = styled.div`
-  position: absolute;
+  /* position: absolute; */
+  position: fixed;
+  top: 84px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   /* margin-left: 10px; */
 
-  height: 700px;
+  height: fit-content;
   overflow: auto;
 
   border-radius: 10px;
@@ -95,9 +67,11 @@ const SubforumWrapper = styled.div`
   border-right: 1px solid;
   padding-right: 10px;
   padding-left: 10px;
+
+  padding-bottom: 10px;
 `;
 
-const SubforumButton = styled.button`
+const SubforumButton = styled.button<{ active?: boolean }>`
   border-radius: 10px;
   padding: 10px 50px;
   font-style: italic;
@@ -106,13 +80,17 @@ const SubforumButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: #fff;
+    background-color: #ababab;
   }
+
+  background-color: ${(props) => (props?.active ? "#736e6e" : "")};
+  color: ${(props) => (props?.active ? "#ffffff" : "#000000")};
 `;
 
 export default function Home() {
   const [subforumModal, setSubforumModal] = useState(false);
   const [postModal, setPostModal] = useState(false);
+  const [activeSubforum, setActiveSubforum] = useState(0);
   const userId = localStorage.getItem("userId");
 
   useGetPosts();
@@ -123,6 +101,7 @@ export default function Home() {
       return fetchPosts();
     },
   });
+  if (listOfPosts) console.log(listOfPosts);
 
   const { data: listOfSubforums } = useQuery({
     queryKey: ["subforums"],
@@ -131,9 +110,23 @@ export default function Home() {
     },
   });
 
-  if (listOfPosts) {
-    console.log("listOfPosts: ", listOfPosts);
-  }
+  const { data: postLikes } = useQuery({
+    queryKey: ["likes-for-post"],
+    queryFn: () => {
+      return fetchPostsLikes({
+        postsId: listOfPosts.map((item: any) => item.id),
+      });
+    },
+    enabled: !!listOfPosts,
+  });
+
+  const { data: userLikes } = useQuery({
+    queryKey: ["likes-for-user"],
+    queryFn: () => {
+      return fetchUserLikes({ userId: userId ?? "1" });
+    },
+    enabled: !!(postLikes && userId),
+  });
 
   return (
     <>
@@ -142,7 +135,22 @@ export default function Home() {
         <h2>Subforums</h2>
         {listOfSubforums ? (
           listOfSubforums.map((item: any, index: number) => (
-            <SubforumButton key={index}>{item.name}</SubforumButton>
+            <SubforumButton
+              active={item.id.toString() === localStorage.getItem("subforumId")}
+              onClick={() => {
+                const subforumId = localStorage.getItem("subforumId");
+                if (subforumId === item.id.toString()) {
+                  localStorage.removeItem("subforumId");
+                  setActiveSubforum(0);
+                } else {
+                  localStorage.setItem("subforumId", item.id);
+                  setActiveSubforum(item.id);
+                }
+              }}
+              key={index}
+            >
+              {item.name}
+            </SubforumButton>
           ))
         ) : (
           <div>No Subforums</div>
@@ -164,24 +172,33 @@ export default function Home() {
           </ButtonWrapper>
         )}
         <PostsContainer>
-          {/* {POSTS.map((item: any) => {
-            return <RedditCard key={Math.random()} {...item} />;
-          })} */}
           {listOfPosts ? (
             listOfPosts.map((item: any, index: number) => {
+              const findPostLikes = postLikes?.find(
+                (postLike) => postLike.postId === item.id
+              );
+              const userLike = userLikes?.find((userLike: any) =>
+                findPostLikes?.likes?.some(
+                  (postLike: any) => postLike.id === userLike.id
+                )
+              );
               return (
                 <RedditCard
                   key={index}
+                  postId={item.id}
                   content={item.content}
                   title={item.title}
-                  likes={0}
-                  comments={0}
                   creator={`${item?.creator?.firstName} ${item?.creator?.lastName}`}
                   subforum={
-                    listOfSubforums.find((subforum: any) =>
-                      subforum.posts.some((item2: any) => item2.id === item.id)
+                    listOfSubforums?.find((subforum: any) =>
+                      subforum?.posts?.some(
+                        (item2: any) => item2?.id === item?.id
+                      )
                     )?.name ?? ""
                   }
+                  isLikedPost={!!userLike}
+                  likes={findPostLikes?.likes.length ?? 0}
+                  userLikeId={userLike?.id ?? null}
                 />
               );
             })

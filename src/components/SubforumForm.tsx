@@ -61,7 +61,6 @@ const SubforumForm: React.FC<{ onSubmitForm: () => void }> = ({
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
-    console.log(data);
 
     try {
       const daaata = await createSubforum({ body: data });

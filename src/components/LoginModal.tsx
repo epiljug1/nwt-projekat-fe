@@ -52,7 +52,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
       style={customStyles}
       isOpen={isOpen}
       onRequestClose={() => {
-        console.log("req close");
         onCloseModal();
       }}
     >

@@ -16,6 +16,10 @@ const NavBar = styled.nav`
   background-color: #ff4500;
   padding: 10px 20px;
   color: white;
+
+  position: sticky;
+  top: 0;
+  z-index: 1;
 `;
 
 const Logo = styled.div`

@@ -53,7 +53,6 @@ const SubforumModal: React.FC<SignupProps> = ({ isOpen, onCloseModal }) => {
       style={customStyles}
       isOpen={isOpen}
       onRequestClose={() => {
-        console.log("req close");
         onCloseModal();
       }}
     >

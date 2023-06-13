@@ -3,14 +3,22 @@ import Modal from "react-modal";
 import SignupForm from "./SignupForm";
 import styled from "styled-components";
 import LoginForm from "./LoginForm";
-import SubforumForm from "./SubforumForm";
-import PostForm from "./PostForm";
+import InspectPost from "./InspectPost";
 
 Modal.setAppElement("#root");
 
-interface PostModalProps {
+interface Post {
+  content: string;
+  title: string;
+  creator: string;
+  subforum: string;
+  postId: number;
+}
+
+interface InspectPostModalProps {
   isOpen: boolean;
   onCloseModal: () => void;
+  post: Post;
 }
 
 const customStyles = {
@@ -24,7 +32,7 @@ const customStyles = {
     padding: "10px",
     width: "450px",
     paddingTop: "50px",
-    paddingBottom: "100px",
+    paddingBottom: "30px",
     border: "none",
     borderRadius: "15px",
   },
@@ -43,12 +51,15 @@ const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
   width: 90%;
-  align-items: center;
 
   margin: 0 auto;
 `;
 
-const PostModal: React.FC<PostModalProps> = ({ isOpen, onCloseModal }) => {
+const InspectPostModal: React.FC<InspectPostModalProps> = ({
+  isOpen,
+  onCloseModal,
+  post,
+}) => {
   return (
     <Modal
       style={customStyles}
@@ -58,11 +69,11 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onCloseModal }) => {
       }}
     >
       <ModalContent>
-        <Title>Create New Post</Title>
-        <PostForm closeModal={onCloseModal} />
+        {/* <Title>Log in</Title> */}
+        <InspectPost {...post} />
       </ModalContent>
     </Modal>
   );
 };
 
-export default PostModal;
+export default InspectPostModal;

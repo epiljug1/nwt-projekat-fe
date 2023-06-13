@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { FaRegCommentAlt, FaRegHeart, FaHeart } from "react-icons/fa";
 import { FcLike } from "react-icons/fc";
 import { Toaster, toast } from "react-hot-toast";
+import InspectPostModal from "./InpectPostModal";
+import { addLikeToPost, deleteLikeFromPost } from "../api/fetchPostLikes";
+import { useQueryClient } from "react-query";
 
 const CardContainer = styled.div`
   position: relative;
@@ -55,31 +58,74 @@ const SubforumContainer = styled.div`
   font-style: italic;
 `;
 
+interface CardProps {
+  content: string;
+  title: string;
+  creator: string;
+  subforum: string;
+  postId: number;
+  isLikedPost?: boolean;
+  likes: number;
+  userLikeId?: number;
+}
+
 const RedditCard = ({
   content,
   title,
-  likes,
-  comments,
   creator,
   subforum,
-}: {
-  content: string;
-  title: string;
-  likes: number;
-  comments: number;
-  creator: string;
-  subforum: string;
-}) => {
+  postId,
+  isLikedPost,
+  likes,
+  userLikeId,
+}: CardProps) => {
+  const queryClient = useQueryClient();
   const userId = localStorage.getItem("userId");
 
+  const [isOpenModal, setIsCloseModal] = useState(false);
+
   const [isLiked, setIsLiked] = useState(false);
-  useEffect(() => {
-    if (isLiked) {
-      toast.success("Post liked");
+
+  const commentHandler = () => {
+    setIsCloseModal(true);
+  };
+
+  const onLikeHandler = async () => {
+    setIsLiked(true);
+    toast.success("Post liked");
+    await addLikeToPost({
+      body: {
+        voterId: userId ? +userId : 1,
+        postId,
+      },
+    });
+  };
+
+  const dislikeHandler = async () => {
+    setIsLiked(false);
+    toast.success("Post disliked");
+    queryClient.refetchQueries(["likes-for-post"]);
+    queryClient.refetchQueries(["likes-for-user"]);
+    if (userLikeId) {
+      await deleteLikeFromPost({
+        likeId: userLikeId,
+      });
     }
-  }, [isLiked]);
+  };
+
   return (
     <CardContainer>
+      <InspectPostModal
+        post={{
+          title,
+          content,
+          creator,
+          subforum,
+          postId,
+        }}
+        isOpen={isOpenModal}
+        onCloseModal={() => setIsCloseModal(false)}
+      />
       <CreatorContainer>Created by: {creator}</CreatorContainer>
       <SubforumContainer>{subforum}</SubforumContainer>
       <CardTitle>{title}</CardTitle>
@@ -87,22 +133,36 @@ const RedditCard = ({
       <CardStats>
         {!!userId && (
           <LikeContainer>
-            {isLiked ? (
-              <FcLike
-                style={{ cursor: "pointer" }}
-                onClick={() => setIsLiked(false)}
-              />
+            {isLiked || isLikedPost ? (
+              <>
+                <FcLike
+                  style={{ cursor: "pointer" }}
+                  onClick={dislikeHandler}
+                />
+                {likes + (isLiked ? 1 : 0)}
+              </>
             ) : (
-              <FaRegHeart
-                style={{ cursor: "pointer" }}
-                onClick={() => setIsLiked(true)}
-              />
+              <>
+                <FaRegHeart
+                  style={{ cursor: "pointer" }}
+                  onClick={onLikeHandler}
+                />
+                {likes}
+              </>
             )}
-            {isLiked ? likes + 1 : likes}
+          </LikeContainer>
+        )}
+        {!userId && (
+          <LikeContainer>
+            <FaRegHeart />
+            {likes}
           </LikeContainer>
         )}
         <div style={{ marginLeft: "auto" }}>
-          <FaRegCommentAlt /> {comments}
+          <FaRegCommentAlt
+            style={{ cursor: "pointer" }}
+            onClick={commentHandler}
+          />
         </div>
       </CardStats>
     </CardContainer>

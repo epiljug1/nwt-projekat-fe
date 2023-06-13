@@ -46,6 +46,17 @@ const Input = styled.input`
   font-size: 15px;
 `;
 
+const TextArea = styled.textarea`
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+
+  max-height: 150px;
+  min-height: 50px;
+`;
+
 const Button = styled.button`
   padding: 8px 16px;
   background-color: #ff4500;
@@ -77,7 +88,6 @@ const PostForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
-    console.log(data);
     const subforum = listOfSubforums.find(
       (item: any) => item.name === data.subforum
     );
@@ -111,7 +121,7 @@ const PostForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
         {errors.title && <ErrorMessage>This field is required</ErrorMessage>}
 
         <Label>Content</Label>
-        <Input type="text" {...register("content", { required: true })} />
+        <TextArea {...register("content", { required: true })} />
         {errors.content && <ErrorMessage>This field is required</ErrorMessage>}
 
         <Label>Subforum</Label>
