@@ -14,7 +14,7 @@ const NavBar = styled.nav`
   justify-content: space-between;
   align-items: center;
   background-color: #ff4500;
-  padding: 10px 20px;
+  padding: 0px 20px;
   color: white;
 
   position: sticky;
@@ -78,6 +78,7 @@ const SearchIcon = styled(FcSearch)`
 
 const Navbar: React.FC = () => {
   const [username, setUsername] = useState(localStorage.getItem("username"));
+  const [search, setSearch] = useState("");
 
   const [isSignIn, setIsSignIn] = useState(false);
   const [isLogIn, setIsLogIn] = useState(false);
@@ -88,6 +89,10 @@ const Navbar: React.FC = () => {
       setUsername(localUsername);
     }
   }, [isSignIn, isLogIn]);
+
+  useEffect(() => {
+    localStorage.setItem("searchPost", search);
+  }, [search]);
 
   return (
     <NavBar>
@@ -105,14 +110,17 @@ const Navbar: React.FC = () => {
         }}
       />
       <Logo>Dappe</Logo>
-      <SearchContainer>
+      {/* <SearchContainer>
         <SearchIcon />
-        <Search placeholder="Search..." />
-      </SearchContainer>
+        <Search
+          placeholder="Search post..."
+          onChange={(item) => setSearch(item.target.value)}
+        />
+      </SearchContainer> */}
       <Menu>
         {!username ? (
           <>
-            <Button onClick={() => setIsSignIn(true)}>Sign in</Button>
+            <Button onClick={() => setIsSignIn(true)}>Sign up</Button>
             <Button onClick={() => setIsLogIn(true)}> Log In</Button>
           </>
         ) : (

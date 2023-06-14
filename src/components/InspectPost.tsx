@@ -158,7 +158,7 @@ export default function InspectPost({
       <ContentContainer>{content}</ContentContainer>
       <SubforumCreatorContainer>
         <div>Created by: {creator}</div>
-        <div>Subfoum: {subforum}</div>
+        <div>Subforum: {subforum}</div>
       </SubforumCreatorContainer>
       <LikeContainer>
         <FcLike style={{ scale: "1.5" }} />

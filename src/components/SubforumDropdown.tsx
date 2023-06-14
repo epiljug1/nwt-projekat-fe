@@ -42,7 +42,7 @@ const OptionsContainer = styled.ul`
   margin: 0;
   list-style-type: none;
 
-  max-height: 100px;
+  max-height: 130px;
   overflow-y: auto;
 `;
 

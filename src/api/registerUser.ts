@@ -23,8 +23,7 @@ export async function registerUser({ body }: { body: RegisterUserData }) {
 
   await api.post("/search/search/users", body);
   await api.post("/postcom/post-com/users", body);
+  await api.post("/notification/notification/users", body);
 
-  console.log("REGISTROVANJE USERA: ", data);
-  console.log("REGISTROVANJE USERA opet: ", administratorUser);
   return data.data.status === 200 && administratorUser.status === 200;
 }

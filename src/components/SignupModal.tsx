@@ -49,7 +49,7 @@ const SignUpModal: React.FC<SignupModalProps> = ({ isOpen, onCloseModal }) => {
   return (
     <Modal style={customStyles} isOpen={isOpen} onRequestClose={onCloseModal}>
       <ModalContent>
-        <Title>Sign in</Title>
+        <Title>Sign Up</Title>
         <SignupForm closeModal={onCloseModal}/>
       </ModalContent>
     </Modal>

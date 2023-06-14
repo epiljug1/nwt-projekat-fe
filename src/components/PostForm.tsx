@@ -79,6 +79,7 @@ interface Option {
 }
 
 const PostForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
+  const subforumId = localStorage.getItem("subforumId");
   const queryClient = useQueryClient();
   const {
     control,
@@ -102,7 +103,12 @@ const PostForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
       },
     });
     toast.success("Post created successful");
-    queryClient.refetchQueries(["posts"]);
+
+    if (subforumId) {
+      queryClient.refetchQueries(["subforum-posts"]);
+    } else {
+      queryClient.refetchQueries(["posts"]);
+    }
     closeModal();
   };
 
@@ -130,7 +136,14 @@ const PostForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
           name="subforum"
           render={({ field }) => (
             <SubforumDropdown
-              options={listOfSubforums?.map((item: any) => item.name) ?? []}
+              options={
+                listOfSubforums
+                  ?.filter((item: any) => {
+                    if (!subforumId) return true;
+                    return item.id === +subforumId;
+                  })
+                  .map((item: any) => item.name) ?? []
+              }
               selectedOption={field.value}
               handleOptionSelect={(value) => field.onChange(value)}
             />
